@@ -1,0 +1,6 @@
+optaplanner:
+  solver:
+    termination:
+      spent-limit: 2s  # Search for 2 seconds
+    environment-mode: REPRODUCIBLE
+  solver-config-xml: solverConfig.xml
