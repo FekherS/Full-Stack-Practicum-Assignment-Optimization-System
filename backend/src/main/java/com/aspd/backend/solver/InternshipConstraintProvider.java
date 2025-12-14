@@ -1,5 +1,7 @@
 package com.aspd.backend.solver;
 
+import com.aspd.backend.model.InternshipAssignment;
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.stream.*;
 
 /**
@@ -15,36 +17,36 @@ public class InternshipConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 // HARD CONSTRAINTS
 
-                // Budget and capacity constraints
-                totalInternshipCountMustMatchBudget(constraintFactory),
-                allStudentsMustBeAssignedToInternship(constraintFactory),
-                internshipCapacityMustNotBeExceeded(constraintFactory),
-                minInternshipsPerDemandMustBeMet(constraintFactory),
-
-                // Teacher assignment rules
-                teacherCanOnlyTake_0_1_2_or_4_Internships(constraintFactory),
-                teacherWith_2_or_4_InternshipsMustHaveAllDifferentTypes(constraintFactory),
-                teacherMustSupportPraktikumType(constraintFactory),
-
-                // Subject matching rules
-                teacherMustMatchCourseForZspAndSfp(constraintFactory),
-
-                // Geographic zone constraints
-                internshipsMustBeInAcceptableZones(constraintFactory),
-
-                //  SOFT CONSTRAINTS
-
-                // Distance optimization (PDP only)
-                minimizeStudentToSchoolDistanceForPdp(constraintFactory),
-
-                // Capacity optimization
-                preferFewerStudentsPerInternship(constraintFactory),
-
-                // Teacher workload optimization
-                preferTeachersWithExactly2Internships(constraintFactory),
-
-                // Diversity optimization
-                preferDiverseInternshipTypesPerSchool(constraintFactory),
+//                // Budget and capacity constraints
+//                totalInternshipCountMustMatchBudget(constraintFactory),
+//                allStudentsMustBeAssignedToInternship(constraintFactory),
+//                internshipCapacityMustNotBeExceeded(constraintFactory),
+//                minInternshipsPerDemandMustBeMet(constraintFactory),
+//
+//                // Teacher assignment rules
+//                teacherCanOnlyTake_0_1_2_or_4_Internships(constraintFactory),
+//                teacherWith_2_or_4_InternshipsMustHaveAllDifferentTypes(constraintFactory),
+//                teacherMustSupportPraktikumType(constraintFactory),
+//
+//                // Subject matching rules
+//                teacherMustMatchCourseForZspAndSfp(constraintFactory),
+//
+//                // Geographic zone constraints
+//                internshipsMustBeInAcceptableZones(constraintFactory),
+//
+//                //  SOFT CONSTRAINTS
+//
+//                // Distance optimization (PDP only)
+//                minimizeStudentToSchoolDistanceForPdp(constraintFactory),
+//
+//                // Capacity optimization
+//                preferFewerStudentsPerInternship(constraintFactory),
+//
+//                // Teacher workload optimization
+//                preferTeachersWithExactly2Internships(constraintFactory),
+//
+//                // Diversity optimization
+//                preferDiverseInternshipTypesPerSchool(constraintFactory),
         };
     }
 
@@ -59,6 +61,7 @@ public class InternshipConstraintProvider implements ConstraintProvider {
     Constraint totalInternshipCountMustMatchBudget(ConstraintFactory constraintFactory) {
         // TODO: Implement constraint
         return null;
+
     }
 
     /**
