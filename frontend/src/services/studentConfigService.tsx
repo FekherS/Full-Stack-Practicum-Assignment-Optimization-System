@@ -6,10 +6,10 @@ export interface StudentConfigDto {
     studentId: number;
     year: string;
     schoolType: SchoolType;
-    mainCourse: Course;
-    prefCourse1: Course;
-    prefCourse2: Course;
-    prefCourse3: Course;
+    mainCourse: Course | null;
+    prefCourse1: Course | null;
+    prefCourse2: Course | null;
+    prefCourse3: Course | null;
     pdpI: boolean;
     pdpII: boolean;
     zsp: boolean;
@@ -44,6 +44,7 @@ class StudentConfigService {
 
     // Create new student config
     async createConfig(dto: StudentConfigDto): Promise<StudentConfigDto> {
+        console.log(dto);
         return apiService.post<StudentConfigDto>('/api/student-configs', dto);
     }
 

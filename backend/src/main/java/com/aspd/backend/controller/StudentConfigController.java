@@ -1,12 +1,15 @@
 package com.aspd.backend.controller;
 
+import com.aspd.backend.dto.InternshipDemandDto;
 import com.aspd.backend.dto.StudentConfigDto;
+import com.aspd.backend.model.SchoolType;
 import com.aspd.backend.service.StudentConfigService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/student-configs")
@@ -17,6 +20,7 @@ public class StudentConfigController {
     public StudentConfigController(StudentConfigService configService) {
         this.configService = configService;
     }
+
     @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")
     @GetMapping("/year/{year}")
     public ResponseEntity<List<StudentConfigDto>> getConfigsByYear(@PathVariable String year) {
@@ -24,6 +28,12 @@ public class StudentConfigController {
         return ResponseEntity.ok(dtos);
     }
 
+    @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")
+    @GetMapping("/demand/year/{year}")
+    public ResponseEntity<Map<SchoolType, InternshipDemandDto>> getInternshipDemand(@PathVariable String year) {
+        Map<SchoolType, InternshipDemandDto> demand = configService.tallyInternshipDemand(year);
+        return ResponseEntity.ok(demand);
+    }
 
     @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")
     @GetMapping
@@ -31,7 +41,6 @@ public class StudentConfigController {
         List<StudentConfigDto> dtos = configService.getAllConfigs();
         return ResponseEntity.ok(dtos);
     }
-
 
     @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")
     @GetMapping("/student/{studentId}")
@@ -46,13 +55,13 @@ public class StudentConfigController {
         StudentConfigDto dto = configService.getConfig(studentId, year);
         return ResponseEntity.ok(dto);
     }
+
     @PreAuthorize("hasAnyAuthority('EDIT')")
     @PostMapping
     public ResponseEntity<StudentConfigDto> createConfig(@RequestBody StudentConfigDto dto) {
         StudentConfigDto created = configService.createConfig(dto);
         return ResponseEntity.ok(created);
     }
-
 
     @PreAuthorize("hasAnyAuthority('EDIT')")
     @PutMapping("/{id}")
@@ -74,5 +83,4 @@ public class StudentConfigController {
         List<String> years = configService.getAllYears();
         return ResponseEntity.ok(years);
     }
-
 }

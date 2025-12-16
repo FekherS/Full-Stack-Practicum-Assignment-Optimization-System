@@ -53,7 +53,7 @@ class CompletedInternshipsRepositoryTest {
         t.setFirstName("Teach");
         t.setLastName("Er");
         t.setEmail("teacher@test.com");
-        t.setMainSubject(Course.SCIENCES);
+        t.setMainSubject(Course.GERMAN);
         t.setSchool(school);
         teacherRepository.save(t);
 
@@ -62,7 +62,7 @@ class CompletedInternshipsRepositoryTest {
         ci.setStudent(s);
         ci.setTeacher(t);
         ci.setSchool(school);
-        ci.setCourse(Course.COMPUTER_SCIENCE);
+        ci.setCourse(Course.ENGLISH);
         ci.setStartDate(LocalDate.of(2024, 1, 1));
         ci.setEndDate(LocalDate.of(2024, 6, 30));
         ci.setDescription("Test internship");
@@ -105,7 +105,7 @@ class CompletedInternshipsRepositoryTest {
         t.setFirstName("T");
         t.setLastName("T");
         t.setEmail("t@test.com");
-        t.setMainSubject(Course.SCIENCES);
+        t.setMainSubject(Course.GEOGRAPHY);
         t.setSchool(school);
         teacherRepository.saveAndFlush(t);
 
@@ -113,7 +113,7 @@ class CompletedInternshipsRepositoryTest {
         ci.setStudent(s);
         ci.setTeacher(t);
         ci.setSchool(school);
-        ci.setCourse(Course.OTHER);
+        ci.setCourse(Course.HISTORY);
         ci.setStartDate(LocalDate.of(2023, 9, 1));
         ci.setEndDate(LocalDate.of(2024, 2, 28));
         ci.setType(PraktikumType.SFP);

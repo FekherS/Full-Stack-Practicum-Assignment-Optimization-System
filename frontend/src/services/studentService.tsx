@@ -4,8 +4,22 @@ export type SchoolType = "GS" | "MS";
 
 
 export type Course =
-    "COMPUTER_SCIENCE" | "ENGINEERING" | "BUSINESS" |
-    "MEDICINE" | "LAW" | "ARTS" | "SCIENCES" | "OTHER";
+  | "GERMAN"
+  | "GERMAN_AS_SECOND_LANGUAGE"
+  | "ENGLISH"
+  | "MATHEMATICS"
+  | "GEOGRAPHY"
+  | "HISTORY"
+  | "SOCIAL_STUDIES"
+  | "RELIGION_CATHOLIC"
+  | "ART"
+  | "MUSIC"
+  | "SPORT"
+  | "INFORMATICS"
+  | "HOME_AND_GENERAL_STUDIES"
+  | "LITERACY_ACQUISITION"
+  | "WORK_STUDIES";
+
 
 export type PraktikumType = "PDP_I" | "PDP_II" | "ZSP" | "SFP";
 
@@ -24,10 +38,10 @@ export interface Student {
   lastName: string;
   email: string;
   schoolType: SchoolType;
-  mainCourse: Course;
-  prefCourse1: Course;
-  prefCourse2: Course;
-  prefCourse3: Course;
+  mainCourse: Course | null;
+  prefCourse1: Course | null;
+  prefCourse2: Course | null;
+  prefCourse3: Course | null;
   registred: boolean;
   oriented: boolean;
   address?: Address;

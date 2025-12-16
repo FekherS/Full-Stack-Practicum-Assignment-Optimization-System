@@ -1,8 +1,61 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import StudentConfigService from "../../services/studentConfigService";
 import "../../styles/InternshipsAssignment/InternshipAssignmentStudentForm.css";
 import type { StudentConfigDto } from "../../services/studentConfigService";
+
+/* ===== frontend equivalent of SchoolCurriculum ===== */
+
+type SchoolType = "GS" | "MS";
+type Course =
+    | "GERMAN"
+    | "GERMAN_AS_SECOND_LANGUAGE"
+    | "ENGLISH"
+    | "MATHEMATICS"
+    | "GEOGRAPHY"
+    | "HISTORY"
+    | "SOCIAL_STUDIES"
+    | "RELIGION_CATHOLIC"
+    | "ART"
+    | "MUSIC"
+    | "SPORT"
+    | "INFORMATICS"
+    | "HOME_AND_GENERAL_STUDIES"
+    | "LITERACY_ACQUISITION"
+    | "WORK_STUDIES";
+
+const ALLOWED_COURSES: Record<SchoolType, Course[]> = {
+    GS: [
+        "GERMAN",
+        "GERMAN_AS_SECOND_LANGUAGE",
+        "ENGLISH",
+        "MATHEMATICS",
+        "GEOGRAPHY",
+        "HISTORY",
+        "SOCIAL_STUDIES",
+        "RELIGION_CATHOLIC",
+        "ART",
+        "MUSIC",
+        "SPORT",
+        "HOME_AND_GENERAL_STUDIES",
+        "LITERACY_ACQUISITION",
+    ],
+    MS: [
+        "GERMAN",
+        "GERMAN_AS_SECOND_LANGUAGE",
+        "ENGLISH",
+        "MATHEMATICS",
+        "GEOGRAPHY",
+        "HISTORY",
+        "SOCIAL_STUDIES",
+        "RELIGION_CATHOLIC",
+        "ART",
+        "MUSIC",
+        "SPORT",
+        "INFORMATICS",
+        "WORK_STUDIES",
+    ],
+};
 
 interface Props {
     config?: StudentConfigDto;
@@ -20,14 +73,22 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
         pdpII: config?.pdpII ?? false,
         zsp: config?.zsp ?? false,
         sfp: config?.sfp ?? false,
-        mainCourse: config?.mainCourse ?? "COMPUTER_SCIENCE",
-        prefCourse1: config?.prefCourse1 ?? "COMPUTER_SCIENCE",
-        prefCourse2: config?.prefCourse2 ?? "COMPUTER_SCIENCE",
-        prefCourse3: config?.prefCourse3 ?? "COMPUTER_SCIENCE",
+        mainCourse: config?.mainCourse ?? null,
+        prefCourse1: config?.prefCourse1 ?? null,
+        prefCourse2: config?.prefCourse2 ?? null,
+        prefCourse3: config?.prefCourse3 ?? null,
         year: config?.year ?? year,
     });
 
-    const handleChange = <K extends keyof StudentConfigDto>(key: K, value: StudentConfigDto[K]) => {
+    const allowedCourses = useMemo(
+        () => ALLOWED_COURSES[form.schoolType as SchoolType],
+        [form.schoolType]
+    );
+
+    const handleChange = <K extends keyof StudentConfigDto>(
+        key: K,
+        value: StudentConfigDto[K]
+    ) => {
         setForm(prev => ({ ...prev, [key]: value }));
     };
 
@@ -43,6 +104,34 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
         }
     };
 
+    const renderCourseSelect = (
+        key: keyof StudentConfigDto,
+        label: string
+    ) => (
+        <div key={key} className="student-config-field">
+            <label>{label}</label>
+            <select
+                className="student-config-input"
+                value={(form[key] as Course | null) ?? ""}
+                onChange={e =>
+                    handleChange(
+                        key,
+                        e.target.value === ""
+                            ? null
+                            : (e.target.value as any)
+                    )
+                }
+            >
+                <option value="">-- Select --</option>
+                {allowedCourses.map(course => (
+                    <option key={course} value={course}>
+                        {course}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+
     return (
         <div className="student-config-form-container">
             <h3 className="student-config-form-title">
@@ -50,7 +139,7 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
             </h3>
 
             <div className="student-config-split-layout">
-                {/* Left Side: Student Info & Checkboxes */}
+                {/* Left Side */}
                 <div className="student-config-left-section">
                     <div className="student-config-field">
                         <label>Student ID</label>
@@ -58,7 +147,9 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
                             className="student-config-input"
                             type="number"
                             value={form.studentId}
-                            onChange={e => handleChange("studentId", Number(e.target.value))}
+                            onChange={e =>
+                                handleChange("studentId", Number(e.target.value))
+                            }
                         />
                     </div>
 
@@ -73,31 +164,46 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
                         />
                     </div>
 
-                    {/* Only show School Type when editing */}
                     {config && (
                         <div className="student-config-field">
                             <label>School Type</label>
                             <select
                                 className="student-config-input"
                                 value={form.schoolType}
-                                onChange={e => handleChange("schoolType", e.target.value as typeof form.schoolType)}
+                                onChange={e => {
+                                    const newType = e.target.value as SchoolType;
+                                    setForm(prev => ({
+                                        ...prev,
+                                        schoolType: newType,
+                                        mainCourse: null,
+                                        prefCourse1: null,
+                                        prefCourse2: null,
+                                        prefCourse3: null,
+                                    }));
+                                }}
                             >
                                 <option value="GS">GS</option>
-                                <option value="HS">MS</option>
+                                <option value="MS">MS</option>
                             </select>
                         </div>
                     )}
 
-                    {/* Checkboxes */}
-                    <div className="student-config-field" style={{marginTop: '20px'}}>
-                        <label style={{marginBottom: '12px', display: 'block'}}>Internship Types</label>
+                    <div className="student-config-field" style={{ marginTop: "20px" }}>
+                        <label style={{ marginBottom: "12px", display: "block" }}>
+                            Internship Types
+                        </label>
                         <div className="checkbox-group">
                             {["pdpI", "pdpII", "zsp", "sfp"].map(field => (
                                 <div key={field} className="checkbox-label">
                                     <input
                                         type="checkbox"
                                         checked={form[field as keyof StudentConfigDto] as boolean}
-                                        onChange={e => handleChange(field as keyof StudentConfigDto, e.target.checked as any)}
+                                        onChange={e =>
+                                            handleChange(
+                                                field as keyof StudentConfigDto,
+                                                e.target.checked as any
+                                            )
+                                        }
                                     />
                                     <span>{field.toUpperCase()}</span>
                                 </div>
@@ -106,33 +212,13 @@ export default function StudentConfigForm({ config, year, onClose, onSave }: Pro
                     </div>
                 </div>
 
-                {/* Right Side: Courses */}
+                {/* Right Side */}
                 {config && (
                     <div className="student-config-right-section">
-                        {[
-                            ["mainCourse", "Main Course"],
-                            ["prefCourse1", "Preferred Course 1"],
-                            ["prefCourse2", "Preferred Course 2"],
-                            ["prefCourse3", "Preferred Course 3"]
-                        ].map(([key, label]) => (
-                            <div key={key} className="student-config-field">
-                                <label>{label}</label>
-                                <select
-                                    className="student-config-input"
-                                    value={form[key as keyof StudentConfigDto] as string}
-                                    onChange={e => handleChange(key as keyof StudentConfigDto, e.target.value as any)}
-                                >
-                                    <option value="COMPUTER_SCIENCE">COMPUTER_SCIENCE</option>
-                                    <option value="ENGINEERING">ENGINEERING</option>
-                                    <option value="BUSINESS">BUSINESS</option>
-                                    <option value="MEDICINE">MEDICINE</option>
-                                    <option value="LAW">LAW</option>
-                                    <option value="ARTS">ARTS</option>
-                                    <option value="SCIENCES">SCIENCES</option>
-                                    <option value="OTHER">OTHER</option>
-                                </select>
-                            </div>
-                        ))}
+                        {renderCourseSelect("mainCourse", "Main Course")}
+                        {renderCourseSelect("prefCourse1", "Preferred Course 1")}
+                        {renderCourseSelect("prefCourse2", "Preferred Course 2")}
+                        {renderCourseSelect("prefCourse3", "Preferred Course 3")}
                     </div>
                 )}
             </div>
