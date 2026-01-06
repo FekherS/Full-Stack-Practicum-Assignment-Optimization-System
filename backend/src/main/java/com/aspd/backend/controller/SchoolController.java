@@ -6,6 +6,7 @@ import com.aspd.backend.dto.SchoolRequest;
 import com.aspd.backend.dto.SchoolResponse;
 import com.aspd.backend.model.School;
 import com.aspd.backend.service.SchoolService;
+import com.aspd.backend.model.SchoolStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,8 +36,8 @@ public class SchoolController {
 
     @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")
     @GetMapping
-    public List<SchoolResponse> list() {
-        return service.list().stream().map(this::toResponse).collect(Collectors.toList());
+    public List<SchoolResponse> list(@org.springframework.web.bind.annotation.RequestParam(value = "status", required = false) SchoolStatus status) {
+        return service.listByStatus(status).stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @PreAuthorize("hasAuthority('VIEW') or hasAnyAuthority('EDIT')")

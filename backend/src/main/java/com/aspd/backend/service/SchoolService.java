@@ -37,6 +37,13 @@ public class SchoolService {
         return repository.findAll();
     }
 
+    public List<School> listByStatus(SchoolStatus status) {
+        if (status == null) {
+            return repository.findAll();
+        }
+        return repository.findAllByStatus(status);
+    }
+
     public School get(Long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("School", id));
     }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
-import schoolService, { SchoolType } from '../services/schoolService';
+import schoolService, { SchoolType, SchoolStatus } from '../services/schoolService';
 import type { School, SchoolCreate } from '../services/schoolService';
 import '../styles/Schools.css';
 
@@ -33,6 +33,7 @@ export default function Schools() {
     zone: '',
     oepnv: false,
     type: SchoolType.GS,
+    status: SchoolStatus.ACTIVE,
   });
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function Schools() {
         zone: school.zone,
         oepnv: school.oepnv,
         type: school.type,
+        status: school.status ?? SchoolStatus.ACTIVE,
       });
     } else {
       setEditingSchool(null);
@@ -70,6 +72,7 @@ export default function Schools() {
         zone: '',
         oepnv: false,
         type: SchoolType.GS,
+        status: SchoolStatus.ACTIVE,
       });
     }
     setShowModal(true);
@@ -84,6 +87,7 @@ export default function Schools() {
       zone: '',
       oepnv: false,
       type: SchoolType.GS,
+      status: SchoolStatus.ACTIVE,
     });
   };
 
@@ -139,13 +143,24 @@ export default function Schools() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      return;
     }
+
+    if (name === 'type') {
+      setFormData(prev => ({ ...prev, type: value as SchoolType }));
+      return;
+    }
+
+    if (name === 'status') {
+      setFormData(prev => ({ ...prev, status: value as SchoolStatus }));
+      return;
+    }
+
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -186,6 +201,7 @@ export default function Schools() {
             const zone = String(row['Zone'] || row['zone'] || row['ZONE'] || '').trim();
             const oepnvRaw = String(row['ÖPNV'] || row['oepnv'] || row['OEPNV'] || row['Oepnv'] || '').toLowerCase().trim();
             const typeRaw = String(row['Typ'] || row['type'] || row['TYPE'] || row['Type'] || '').toUpperCase().trim();
+            const statusRaw = String(row['Status'] || row['status'] || row['STATUS'] || '').toUpperCase().trim();
             
             console.log(`Row ${index + 1}:`, { name, address, zone, oepnvRaw, typeRaw });
             
@@ -217,6 +233,16 @@ export default function Schools() {
               errors.push('Type ungültig');
               type = ''; // Keep it empty to show it's invalid
             }
+
+            // Parse Status (optional, defaults to ACTIVE)
+            let status: SchoolStatus = SchoolStatus.ACTIVE;
+            if (statusRaw === 'INACTIVE' || statusRaw === 'INAKTIV') {
+              status = SchoolStatus.INACTIVE;
+            } else if (statusRaw === 'ACTIVE' || statusRaw === 'AKTIV' || statusRaw === '') {
+              status = SchoolStatus.ACTIVE;
+            } else if (statusRaw) {
+              errors.push('Status ungültig');
+            }
             
             const school: PreviewSchool = {
               rowNumber: index + 1,
@@ -225,6 +251,7 @@ export default function Schools() {
               zone: zone,
               oepnv,
               type: type as SchoolType,
+              status,
               isValid: errors.length === 0,
               errors
             };
@@ -365,7 +392,8 @@ export default function Schools() {
             address: school.address,
             zone: school.zone,
             oepnv: school.oepnv,
-            type: school.type
+            type: school.type,
+            status: school.status
           });
           successCount++;
         } catch (err) {
@@ -464,6 +492,7 @@ export default function Schools() {
                   <th>Zone</th>
                   <th>ÖPNV</th>
                   <th>Type</th>
+                  <th>Status</th>
                   <th>Aktionen</th>
                 </tr>
               </thead>
@@ -481,6 +510,11 @@ export default function Schools() {
                     <td>
                       <span className={school.type === SchoolType.GS ? 'badge badge-gs' : 'badge badge-ms'}>
                         {school.type === SchoolType.GS ? 'Grundschule' : 'Mittelschule'}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={school.status === SchoolStatus.ACTIVE ? 'badge badge-active' : 'badge badge-inactive'}>
+                        {school.status === SchoolStatus.ACTIVE ? 'Aktiv' : 'Inaktiv'}
                       </span>
                     </td>
                     <td>
@@ -518,6 +552,12 @@ export default function Schools() {
               </div>
               <div className="stat-item">
                 ÖPNV: {schools.filter(s => s.oepnv).length}
+              </div>
+              <div className="stat-item">
+                Aktiv: {schools.filter(s => s.status === SchoolStatus.ACTIVE).length}
+              </div>
+              <div className="stat-item">
+                Inaktiv: {schools.filter(s => s.status === SchoolStatus.INACTIVE).length}
               </div>
             </div>
           </div>
@@ -598,6 +638,23 @@ export default function Schools() {
                 </div>
 
                 <div className="form-group">
+                  <label className="form-label required" htmlFor="status">
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    name="status"
+                    className="form-select"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value={SchoolStatus.ACTIVE}>Aktiv</option>
+                    <option value={SchoolStatus.INACTIVE}>Inaktiv</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
                   <div className="form-checkbox-group">
                     <input
                       type="checkbox"
@@ -654,7 +711,7 @@ export default function Schools() {
                     </p>
                   )}
                   <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                    Die Excel-Datei sollte folgende Spalten enthalten: Name, Adresse, Zone, ÖPNV (true/false), Type (GS/MS)
+                    Die Excel-Datei sollte folgende Spalten enthalten: Name, Adresse, Zone, ÖPNV (true/false), Type (GS/MS) und optional Status (ACTIVE/INACTIVE)
                   </p>
                 </div>
 
@@ -699,6 +756,7 @@ export default function Schools() {
                       <th>Zone</th>
                       <th>ÖPNV</th>
                       <th>Type</th>
+                      <th>Schulstatus</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -763,6 +821,17 @@ export default function Schools() {
                             <option value="">-- Bitte wählen --</option>
                             <option value={SchoolType.GS}>GS</option>
                             <option value={SchoolType.MS}>MS</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select
+                            className="form-select-small"
+                            value={school.status}
+                            onChange={(e) => handlePreviewInputChange(index, 'status', e.target.value as SchoolStatus)}
+                            style={{ backgroundColor: '#374151', color: 'white', border: '1px solid #4b5563' }}
+                          >
+                            <option value={SchoolStatus.ACTIVE}>Aktiv</option>
+                            <option value={SchoolStatus.INACTIVE}>Inaktiv</option>
                           </select>
                         </td>
                       </tr>

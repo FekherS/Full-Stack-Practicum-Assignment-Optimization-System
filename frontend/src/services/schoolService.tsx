@@ -5,6 +5,11 @@ export enum SchoolType {
   MS = 'MS'
 }
 
+export enum SchoolStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
+}
+
 export interface School {
   id: number;
   name: string;
@@ -12,6 +17,7 @@ export interface School {
   zone: string;
   oepnv: boolean;
   type: SchoolType;
+  status: SchoolStatus;
 }
 
 export interface SchoolCreate {
@@ -20,6 +26,7 @@ export interface SchoolCreate {
   zone: string;
   oepnv: boolean;
   type: SchoolType;
+  status: SchoolStatus;
 }
 
 export interface SchoolImportResult {
