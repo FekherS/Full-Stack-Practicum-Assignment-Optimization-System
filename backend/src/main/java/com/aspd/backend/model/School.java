@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.aspd.backend.model.SchoolStatus;
 
 @Entity
 @Table(name = "schools")
@@ -40,6 +41,11 @@ public class School {
     @NotNull
     private SchoolType type; // GS or MS
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull
+    private SchoolStatus status = SchoolStatus.ACTIVE; // ACTIVE or INACTIVE
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
@@ -52,4 +58,6 @@ public class School {
     public void setOepnv(Boolean oepnv) { this.oepnv = oepnv; }
     public SchoolType getType() { return type; }
     public void setType(SchoolType type) { this.type = type; }
+    public SchoolStatus getStatus() { return status; }
+    public void setStatus(SchoolStatus status) { this.status = status; }
 }

@@ -83,6 +83,7 @@ public class SchoolController {
         r.setZone(s.getZone());
         r.setOepnv(s.getOepnv());
         r.setType(s.getType());
+        r.setStatus(s.getStatus());
         return r;
     }
 }

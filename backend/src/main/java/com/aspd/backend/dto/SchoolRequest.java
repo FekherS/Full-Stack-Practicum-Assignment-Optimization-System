@@ -1,6 +1,7 @@
 package com.aspd.backend.dto;
 
 import com.aspd.backend.model.SchoolType;
+import com.aspd.backend.model.SchoolStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,7 @@ public class SchoolRequest {
 
     @NotNull
     private SchoolType type; // GS or MS
+
+    // Optional; defaults to ACTIVE if not provided
+    private SchoolStatus status;
 }

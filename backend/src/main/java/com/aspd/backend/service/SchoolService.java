@@ -6,6 +6,7 @@ import com.aspd.backend.dto.SchoolImportResult;
 import com.aspd.backend.dto.SchoolRequest;
 import com.aspd.backend.model.School;
 import com.aspd.backend.model.SchoolType;
+import com.aspd.backend.model.SchoolStatus;
 import com.aspd.backend.repository.SchoolRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -66,6 +67,7 @@ public class SchoolService {
         s.setZone(req.getZone());
         s.setOepnv(req.getOepnv());
         s.setType(req.getType());
+        s.setStatus(req.getStatus() != null ? req.getStatus() : SchoolStatus.ACTIVE);
     }
 
     @Transactional
@@ -194,6 +196,7 @@ public class SchoolService {
         s.setZone(zone);
         s.setOepnv(oepnv);
         s.setType(type);
+        s.setStatus(SchoolStatus.ACTIVE);
         return s;
     }
 
