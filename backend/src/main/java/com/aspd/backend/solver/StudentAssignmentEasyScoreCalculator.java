@@ -64,6 +64,16 @@ public class StudentAssignmentEasyScoreCalculator implements EasyScoreCalculator
             }
         }
         
+        // Soft constraint: Penalize unused internships (to comply with budget)
+        // Each internship that has no students assigned loses points
+        // This ensures optimal distribution across all available internships
+        for (PlannedInternship internship : solution.getAvailableInternships()) {
+            if (!assignmentCounts.containsKey(internship)) {
+                // Internship is unused - penalize this
+                hardScore -= 50;
+            }
+        }
+        
         return HardSoftScore.of(hardScore, softScore);
     }
 
