@@ -359,6 +359,7 @@ The \textit{Praktikumsamt} can adjust:
 \begin{itemize}
     \item Budget limits per semester
     \item Teacher preferences and availability
+    \item Solver time limit (maximum optimization runtime) for phase 1
 \end{itemize}
 
 \subsection{Interactive Assignment Management}
@@ -801,6 +802,8 @@ For semester-to-semester continuity, the system supports reoptimization:
 
 Optimization runs can be executed asynchronously to avoid blocking the UI. When started asynchronously, the backend returns a job identifier immediately. The frontend polls a job-status endpoint periodically and shows progress until the job finishes (completed or failed). Concurrency safeguards prevent running Phase 1 and Phase 2 simultaneously for the same school year.
 
+Users can also set a solve timer (time limit) for each optimization run to accommodate their schedule and availability. If the resulting solution is not satisfactory, they can rerun the solver with a longer time limit to explore better alternatives.
+
 \section{Import/Export and Validation}
 
 The system supports administrative workflows through Excel import/export (using Apache POI). Validation services detect missing/invalid data (e.g., missing qualifications, inconsistent configurations) before running optimization, and return user-friendly error messages that the frontend can display.
@@ -975,14 +978,17 @@ Tested with 108 placements, 30 schools, 80 teachers across typical semester, tig
 
 \textbf{Performance:}
 \begin{itemize}
-    \item Total runtime: 90-150 seconds (Phase 1: 60-90s, Phase 2: 30-60s)
-    \item Hard constraints: 100\% satisfaction
+\item The solution process is divided into two phases with distinct computational characteristics
+\item Phase 1 addresses slot activation and assignment under complex constraints; due to its NP-hard nature, runtime is provided as a user-defined input parameter
+\item Phase 2 performs matching over the limited set of slots activated in Phase 1 and was therefore executed with a fixed 2-minute time limit during testing
+\item Extended Phase 1 runtimes generally led to improved feasibility in Phase 2, resolving most remaining constraint violations
+\item Residual violations were primarily attributable to input test-data quality rather than solver behavior
 \end{itemize}
 
 \textbf{Quality:}
 \begin{itemize}
-    \item Hard constraints: Zero violations (budget, qualifications, workload, zones)
-    \item Soft: 85\% teachers assigned 2 internships, 90\% PDP students within 20 km (avg 12 km), 80\% ZSP matched to top-4 courses
+    \item With a longer time limit, the phase solver achieved near-complete feasibility aside from data-quality constraints
+    \item With a longer time limit, the phase solver achieved better distance assignments
 \end{itemize}
 
 \section{Known Limitations}
