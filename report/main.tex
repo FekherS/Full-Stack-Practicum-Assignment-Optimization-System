@@ -729,14 +729,36 @@ Phase 1 uses an \texttt{EasyScoreCalculator} for transparent, explicit scoring. 
 \paragraph{Hard constraints (feasibility).}
 Representative enforced rules include:
 \begin{itemize}
-    \item Budget alignment / limiting active slots
-    \item Active internship must have an assigned teacher
-    \item Teacher workload validity (allowed counts and limits)
-    \item Teacher diversity: multiple internships per teacher must be different types
-    \item School type compatibility (GS/MS) and school active status
-    \item Course rules: PDP has no course; SFP course is fixed; ZSP requires a course
-    \item Zone / ÖPNV feasibility rules by internship type
+    \item \textbf{Course pinning rules} (very high penalty: -1000): PDP internships must have no course; SFP courses are fixed and immutable
+    \item \textbf{Budget alignment} (high penalty: -2000 per deviation): total activated internships must not exceed institutional budget
+    \item \textbf{Minimum slot activations} (high penalty: -500 per missing slot):
+    \begin{itemize}
+        \item Per (school type, internship type) pair (e.g., GS/PDP I) to accommodate all student demands
+        \item For SFP: per (school type, internship type, course) triple (e.g., GS/SFP/English)
+    \end{itemize}
+    \item \textbf{Teacher assignment requirements} (high penalty: -300):
+    \begin{itemize}
+        \item Active internships must have an assigned teacher
+        \item Assigned teachers must be active
+    \end{itemize}
+    \item \textbf{School type compatibility} (high penalty: -300): GS/MS matching and school active status
+    \item \textbf{Teacher diversity} (high penalty: -500): teachers with multiple internships must supervise different types
+    \item \textbf{Zone / ÖPNV feasibility} (medium penalty: -200): internship type-specific zone rules and ÖPNV 4b exclusion for PDP
+    \item \textbf{ZSP course requirement} (medium penalty: -150): active ZSP internships must have a course assigned
+    \item \textbf{Teacher max types} (medium penalty: -100 per excess): maximum 2 internship types per teacher per semester
+    \item \textbf{Teacher preference alignment} (low penalty: -50):
+    \begin{itemize}
+        \item Teacher supports the assigned internship type
+        \item Teacher qualified for assigned course (ZSP/SFP)
+        \item Workload within allowed counts (0, 1, 2, or 4)
+    \end{itemize}
+    \item \textbf{Teacher max workload per year} (low penalty: -40 per excess): respects individual teacher annual limits
 \end{itemize}
+
+\textbf{Constraint priority examples:}
+The penalty structure reflects business priorities. For instance, leaving an internship slot unassigned (-300 penalty) is worse than assigning a teacher to 3 internships (-50 penalty for invalid workload count), ensuring all students receive placements even if teacher preferences are compromised.
+
+Minimum activation calculations account for internship capacity: if 10 students require GS/PDP I placements, at least 5 slots must be activated (PDP capacity = 2 students per slot, so $\lceil 10/2 \rceil = 5$). Similarly, 13 students requiring MS/ZSP necessitate at least 4 active slots (ZSP capacity = 4 students per slot, so $\lceil 13/4 \rceil = 4$).
 
 \paragraph{Soft constraints (quality).}
 Representative preferences include:
